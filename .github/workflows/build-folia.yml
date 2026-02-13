@@ -28,7 +28,7 @@ jobs:
           git config --global user.email "actions@github.com"
 
       - name: Apply all patches
-        run: ./gradlew applyAllPatches --no-daemon
+        run: ./gradlew createMojmapBundlerJar --no-daemon
 
       - name: Build Folia
         run: ./gradlew createReobfBundlerJar --no-daemon
