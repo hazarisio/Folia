@@ -1,40 +1,28 @@
-name: Build Folia
+name: Patch and Build
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: [ "**" ]
+  pull_request:
 
 jobs:
   build:
+    # Only run on PRs if the source branch is on someone else's repo
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v5
-
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
+      - name: Checkout Git Repository
+        uses: actions/checkout@v6
+      - name: Set up JDK
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
-          java-version: 21
-          cache: gradle
-
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Apply all patches
-        run: ./gradlew createMojmapBundlerJar --no-daemon
-
-      - name: Build Folia
-        run: ./gradlew createReobfBundlerJar --no-daemon
-
-      - name: Upload jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: folia-server
-          path: build/libs/*.jar
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Configure Git User Details
+        run: git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+      - name: Apply Patches
+        run: ./gradlew applyAllPatches --stacktrace
+      - name: Build
+        run: ./gradlew build
