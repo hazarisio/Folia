@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew applyAllPatches --stacktrace
 
       - name: Build Server Jar
-        run: ./gradlew createReobfPaperclipJar --no-daemon --stacktrace
+        run: ./gradlew createMojmapPaperclipJar --no-daemon --stacktrace
 
       - name: Upload Built Jar
         uses: actions/upload-artifact@v4
